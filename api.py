@@ -4,6 +4,7 @@ from pydantic import BaseModel
 import shutil
 import os
 import uuid
+from orm import esquemas
 import orm.repo as repo #funciones para hacer consultas a la BD
 from sqlalchemy.orm import Session
 from orm.config import generador_sesion #generador de sesiones
@@ -28,7 +29,7 @@ class UsuarioBase(BaseModel):
 def hola_mundo():
     print("invocando a ruta /")
     respuesta = {
-        "mensaje": "hola mundo!"
+        "mensaje": "Bienvenido a mi appi :)!"
     }
 
     return respuesta
@@ -123,7 +124,43 @@ def borrar_fotos(id:int, sesion:Session=Depends(generador_sesion)):
 
 
 
+#Atiende las siguientes peticiones del tipo PUT y POST: PRACTICA 2
+@app.post("/alumnos")
+def guardar_alumno(alumno:esquemas.AlumnoBase,sesion:Session=Depends(generador_sesion)):
+    print("Agregando alumno por id alumno")
+    print(alumno)
+    #guardado en la base.
+    return repo.guardar_alumno(sesion,alumno)
+
+@app.put("/alumnos/{id}")
+def actualizar_alumno(id:int,info_alumno:esquemas.AlumnoBase,sesion:Session=Depends(generador_sesion)):
+    print("Actualizando alumno por id alumno")
+    print(info_alumno)
+    return repo.actualiza_alumno(sesion,id,info_alumno)
+    
 
  
+@app.post("/alumnos/{id}/calificaciones")
+def guardar_calificacion_id_alumno(id_alunmno:int,calificacion:esquemas.CalificacionesBase,sesion:Session=Depends(generador_sesion)):
+    print("Agregando calificacion por id alumno")
+    print(calificacion)
+    return repo.guardar_calificacion_id_alumno(sesion,calificacion)
 
 
+@app.put("/calificaciones/{id}")
+def actualizar_calificacion_id(id_calif:int,info_calif:esquemas.CalificacionesBase,sesion:Session=Depends(generador_sesion)):
+    print("Actualizando calificaciones de alumno")
+    return repo.actualizar_calificacion_calificacion_id(sesion,id_calif,info_calif)
+
+@app.post("/alumnos/{id}/fotos")
+def guardar_foto_alumno_id_alumno(id_alumno:int,Foto:esquemas.FotosBase, sesion:Session=Depends(generador_sesion)):
+    print("Agregando foto ")
+    print(Foto)
+    return repo.guardar_foto_alumno_id(sesion,id_alumno,Foto)
+
+
+@app.put("/fotos/{id}")
+def actualizar_foto_id(id_foto:int,info_calif:esquemas.FotosBase,sesion:Session=Depends(generador_sesion)):
+    print("Actualizando la foto por id")
+    print(info_calif)
+    return repo.actualizar_foto_por_id(sesion,id_foto,info_calif)
